@@ -15,7 +15,7 @@ searchable in plain language on a staff search page.
 
 | | |
 |---|---|
-| Files catalogued | about 108,000 photos and videos (about 98,800 photos, 9,800 videos) |
+| Files catalogued | about 108,200 photos and videos (about 98,500 photos, 9,700 videos) |
 | Video scenes | over 109,000 scenes, each with its own description and search entry |
 | New uploads | analysed overnight and searchable the next morning, with no one starting any step |
 | Video speed-up | about 5 minutes per video down to about 20 seconds, by making a whole-library safety check incremental |
@@ -38,27 +38,33 @@ flowchart LR
 
 1. **Scan** (`pipeline/run_ml_test.py plan`): lists every media file on the NAS share that the library
    does not have yet, skips files changed in the last hour (still copying), and writes batches of 500.
+   
 2. **Step 1, Register** (`step1_ingest.py`, `writer.py`): copies each file to a local cache, hashes it
    (SHA-256, plus MD5 for later cloud matching), reads capture date, size, duration and orientation,
    and stores one asset per unique file. Exact duplicates are linked, not stored twice.
+   
 3. **Step 2, Analyse** (`step2_analyse.py`, `step2_worker.py`, `step2_stills*.py`):
    - videos: scene detection, keyframes, speech-to-text with Whisper large-v3-turbo on Apple silicon
      (MLX), on-screen text with OCR tuned by a clinic word list, raw/edited classification;
    - photos: on-screen text with Apple Vision OCR.
-   Each video runs in a separate worker process with time ceilings per stage, so one bad file cannot
+   -Each video runs in a separate worker process with time ceilings per stage, so one bad file cannot
    stall a batch.
+
 4. **Step 3, Describe** (`step3_v3_supervise.py`, `edge_functions/media-analyse.ts`): a Supabase Edge
    Function sends keyframes, transcript and OCR to an AI model (DeepSeek), which returns a structured
    description: people (look, age range, role, expression), activity, treatment, setting, mood. Spend
    caps and a balance guard stop it before money runs out.
-5. **Step 4, Search index** (`step4_v3_embed.py`, `edge_functions/embed.ts`): every description becomes a
+   
+6. **Step 4, Search index** (`step4_v3_embed.py`, `edge_functions/embed.ts`): every description becomes a
    text embedding (gte-small, run inside Supabase), so search works by meaning, not exact words.
-6. **Content Desk** (`web/content_desk.html`, `database/016-017`): staff describe what they need in a
+   
+8. **Content Desk** (`web/content_desk.html`, `database/016-017`): staff describe what they need in a
    sentence ("Dr Inder marking the hairline of a man in his 30s"). An AI model turns the request into a
    structured brief, a ranked SQL search (`desk_search`) scores scenes on people, activities, phrases
    and full-text match, and the model picks the best files. "Show different files" excludes everything
    already shown.
-7. **Nightly automation** (`pipeline/nightly.py`, `ops/`): a macOS launchd job runs the whole chain at
+   
+10. **Nightly automation** (`pipeline/nightly.py`, `ops/`): a macOS launchd job runs the whole chain at
    9 pm. Each batch goes through Steps 1-4 and becomes searchable on its own. Every run writes a row
    to `nightly_runs`, shown on `web/nightly_runs.html`, so a missed or failed night is visible.
 
