@@ -1,0 +1,43 @@
+# Phase A / Step 1 ingestion - deterministic measurement only.
+# No AI/ML packages belong in this file (Rule 2).
+Pillow==12.3.0
+pillow-heif==1.7.0
+google-api-python-client==2.200.0
+google-auth==2.58.0
+google-auth-oauthlib==1.4.1
+google-auth-httplib2==0.4.2
+
+# Step 1 --commit path: direct Postgres into test_v1 (one transaction for the
+# whole run). Not a REST client - see scripts/db.py for why.
+psycopg[binary]==3.2.12
+
+# Step 2: deterministic analysis. faster-whisper is CTranslate2, not torch;
+# easyocr is a local OCR engine. Neither describes image content - no vision
+# model is permitted in Step 1 or Step 2.
+faster-whisper==1.2.1
+# 26 Oct 2026: faster-whisper 1.2.1 calls av.open(metadata_errors=...), which
+# PyAV 14+ removed (TypeError on every transcription). Keep PyAV below 14.
+av>=11,<14
+easyocr==1.7.2
+
+# STEP2_OCR 3.0.0 engine: RapidOCR runs PaddleOCR's PP-OCR text detection and
+# recognition models (PP-OCRv6) on ONNX runtime. A dedicated OCR engine - it
+# reads characters, it does not describe images. Chosen on a measured
+# benchmark (pipeline_config ocr_engine_benchmark); easyocr stays for
+# comparison and as a configurable fallback (ocr_engine).
+rapidocr==3.9.2
+onnxruntime==1.30.0
+
+# Step 3 (content_v1, scripts_content_v1/step3_vision.py): vision analysis is
+# the first step that uses an AI model - one Claude model via the Anthropic
+# API (pipeline_config vision_model). Steps 1 and 2 still use none of this.
+# The key comes from ANTHROPIC_API_KEY only.
+anthropic==1.9.0
+jsonschema==4.26.0
+# 2 Nov 2026: Apple Vision OCR for stills, Apple sound classifier (music check),
+# Whisper large-v3-turbo on the M4 GPU for video speech
+pyobjc-framework-Vision==13.0
+pyobjc-framework-Quartz==13.0
+pyobjc-framework-SoundAnalysis==13.0
+pyobjc-framework-AVFoundation==13.0
+mlx-whisper==0.4.3

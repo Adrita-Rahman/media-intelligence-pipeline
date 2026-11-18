@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- The KDI file viewer (scripts_content_v1/file_viewer.py): opens and downloads NAS files
+     from the Content Desk page, on port 8790. Installed by deploy/launchd/install.sh viewer-on.
+     Starts at login and is restarted if it stops. Same Python as the nightly run, so the Full
+     Disk Access given to Python covers the NAS and the work drive. The launchd console
+     log is in /tmp: launchd may not create files on the work drive (see kdi-nightly). -->
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.klinikdrinder.kdi-viewer</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/Volumes/WorkDrive/repos/kdi-content-v1-pipeline/venv/bin/python</string>
+    <string>-u</string>
+    <string>/Volumes/WorkDrive/repos/kdi-content-v1-pipeline/scripts_content_v1/file_viewer.py</string>
+  </array>
+  <key>WorkingDirectory</key>
+  <string>/Volumes/WorkDrive/repos/kdi-content-v1-pipeline</string>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PIPELINE_TARGET</key>
+    <string>ml_test</string>
+    <key>PATH</key>
+    <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+  </dict>
+  <key>RunAtLoad</key>
+  <true/>
+  <key>KeepAlive</key>
+  <true/>
+  <key>ThrottleInterval</key>
+  <integer>30</integer>
+  <key>StandardOutPath</key>
+  <string>/tmp/kdi-viewer.log</string>
+  <key>StandardErrorPath</key>
+  <string>/tmp/kdi-viewer.log</string>
+</dict>
+</plist>

@@ -1,0 +1,254 @@
+<meta name="dash-one-writer">
+<style>
+  .nr { display: flex; flex-direction: column; gap: var(--cds-gap-xl); font-family: var(--font-anthropic-sans); color: var(--color-fg); }
+  .nr-title { font-family: var(--font-anthropic-serif); font-weight: 400; font-size: var(--cds-font-size-title); margin: 0; text-wrap: balance; }
+  .nr-lead { font-size: var(--cds-font-size-body); line-height: 1.5; margin: var(--cds-gap-sm) 0 0; max-width: 62ch; }
+  .nr h2 { font-size: var(--cds-font-size-heading); font-weight: var(--cds-font-weight-medium); margin: 0; }
+  .nr-sub { color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); margin: var(--cds-gap-xs) 0 var(--cds-gap-md); max-width: 62ch; }
+  .nr-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--cds-gap-md); }
+  .nr-tile { background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: var(--cds-pad-lg); display: flex; flex-direction: column; gap: var(--cds-gap-xs); }
+  .nr-tile-label { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+  .nr-tile-num { font-family: var(--font-anthropic-serif); font-weight: 400; font-size: 2rem; font-variant-numeric: tabular-nums; line-height: 1.1; }
+  .nr-tile-note { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+  .nr-dot { display: inline-block; width: .7em; height: .7em; border-radius: 2px; margin-right: .4em; vertical-align: baseline; }
+  .nr-strip-wrap { position: relative; min-height: 64px; }
+  .nr-strip { display: flex; flex-wrap: wrap; gap: 6px; }
+  .nr-night { display: flex; flex-direction: column; align-items: center; gap: 3px; width: 30px; cursor: default; outline: none; }
+  .nr-sq { width: 26px; height: 26px; border-radius: 5px; border: 1px solid transparent; box-sizing: border-box; }
+  .nr-night:focus-visible .nr-sq, .nr-night:hover .nr-sq { box-shadow: 0 0 0 2px var(--color-fg); }
+  .nr-day { font-size: 10.5px; color: var(--color-fg-muted); font-variant-numeric: tabular-nums; }
+  .nr-tip { position: absolute; z-index: 2; max-width: 280px; background: var(--cds-surface-popover); border: 1px solid var(--cds-border); box-shadow: var(--cds-shadow-popover); border-radius: var(--cds-radius); padding: var(--cds-pad-sm) var(--cds-pad-md); font-size: var(--cds-font-size-caption); line-height: 1.45; pointer-events: none; }
+  .nr-tip b { display: block; margin-bottom: 2px; }
+  .nr-tip span { color: var(--cds-text-secondary); }
+  .nr-legend { display: flex; flex-wrap: wrap; gap: var(--cds-gap-sm) var(--cds-gap-lg); list-style: none; padding: 0; margin: var(--cds-gap-md) 0 0; font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+  .s-finished { background: var(--color-ok); }
+  .s-problems { background: var(--color-warn); }
+  .s-norun { background: var(--color-bad); }
+  .s-running { background: var(--color-fg-muted); }
+  .s-blocked { background: var(--color-border-line); }
+  .s-tonight { background: transparent; border: 1px dashed var(--color-fg-muted); }
+  .nr-table-wrap { overflow-x: auto; }
+  .nr-table { width: 100%; border-collapse: collapse; font-size: var(--cds-font-size-caption); font-variant-numeric: tabular-nums; }
+  .nr-table th { text-align: left; font-weight: var(--cds-font-weight-medium); color: var(--color-fg-muted); padding: var(--cds-pad-sm) var(--cds-pad-sm); border-bottom: 1px solid var(--color-border-line); white-space: nowrap; }
+  .nr-table td { padding: var(--cds-pad-sm); border-bottom: 1px solid var(--color-border-line); vertical-align: top; }
+  .nr-table .num { text-align: right; white-space: nowrap; }
+  .nr-table .when { white-space: nowrap; }
+  .nr-table .notes { color: var(--color-fg-muted); min-width: 220px; max-width: 420px; }
+  .nr-pill { display: inline-flex; align-items: center; gap: .35em; white-space: nowrap; }
+  .nr-foot { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+  .nr-foot summary { cursor: pointer; color: var(--color-fg); }
+  .nr-foot ul { padding-left: 1.2em; line-height: 1.55; max-width: 70ch; }
+</style>
+
+<div class="nr">
+  <header id="summary">
+    <h1 class="nr-title">KDI Nightly Runs</h1>
+    <p class="nr-lead" data-draw="lead">—</p>
+  </header>
+
+  <section id="tally" class="nr-tiles" aria-label="Last 30 nights in numbers">
+    <div class="nr-tile">
+      <span class="nr-tile-label"><i class="nr-dot s-finished"></i>Finished properly</span>
+      <span class="nr-tile-num dash-skeleton" data-draw="t-finished" data-source="tally" data-field="finished" data-row="0">—</span>
+      <span class="nr-tile-note">nights, last 30 days</span>
+    </div>
+    <div class="nr-tile">
+      <span class="nr-tile-label"><i class="nr-dot s-problems"></i>Had problems</span>
+      <span class="nr-tile-num dash-skeleton" data-draw="t-problems" data-source="tally" data-field="problems" data-row="0">—</span>
+      <span class="nr-tile-note">a batch stopped or a drive dropped</span>
+    </div>
+    <div class="nr-tile">
+      <span class="nr-tile-label"><i class="nr-dot s-norun"></i>No run</span>
+      <span class="nr-tile-num dash-skeleton" data-draw="t-missed" data-source="tally" data-field="missed" data-row="0">—</span>
+      <span class="nr-tile-note">iMac off, or a check failed</span>
+    </div>
+  </section>
+
+  <section id="nights">
+    <h2>Night by night</h2>
+    <p class="nr-sub">One square per night, oldest on the left. A night covers 9 pm until noon the next day, so a run started in the morning counts for the night before. Point at a square for details.</p>
+    <div class="nr-strip-wrap" data-draw="strip" data-source="nights"></div>
+    <ul class="nr-legend">
+      <li><i class="nr-dot s-finished"></i>Finished properly</li>
+      <li><i class="nr-dot s-problems"></i>Had problems</li>
+      <li><i class="nr-dot s-norun"></i>No run</li>
+      <li><i class="nr-dot s-running"></i>Still running</li>
+      <li><i class="nr-dot s-blocked"></i>Blocked by an earlier run</li>
+      <li><i class="nr-dot s-tonight"></i>Tonight, not started yet</li>
+    </ul>
+  </section>
+
+  <section id="runs">
+    <h2>Every run</h2>
+    <p class="nr-sub">Newest first, last 60 days. "9 pm" runs start by themselves; "manual" runs were started by hand to catch up.</p>
+    <div class="nr-table-wrap">
+      <table class="nr-table" data-source="runs" data-row-key="started" data-fetchpriority="low">
+        <thead>
+          <tr>
+            <th data-field="started">Started</th>
+            <th data-field="result">Result</th>
+            <th data-field="trigger">Started by</th>
+            <th class="num" data-field="new_files">New files</th>
+            <th class="num" data-field="ingested">Added</th>
+            <th class="num" data-field="searchable">Searchable</th>
+            <th class="num" data-field="deepseek_usd">DeepSeek</th>
+            <th class="num" data-field="hours">Hours</th>
+            <th data-field="notes">Notes</th>
+          </tr>
+        </thead>
+        <tbody data-draw="runs-body"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <details class="nr-foot">
+    <summary>How to read this page</summary>
+    <ul>
+      <li>The iMac runs the pipeline every night at 9 pm. It looks for new photos and videos on the NAS, analyses them and makes them searchable on the Content Desk.</li>
+      <li><b>Finished properly</b>: every step ended without errors. <b>Had problems</b>: a batch stopped, a drive disconnected, or the run was stopped on purpose; the next run picks up where it left off.</li>
+      <li><b>No run</b>: nothing was recorded for that night. Usually the iMac was off or asleep. A run that could not start because the NAS or work drive was missing shows the reason in the table.</li>
+      <li><b>New files</b> are files found on the NAS that night. <b>Added</b> and <b>Searchable</b> count the files of that night's batches that reached the library and the search page.</li>
+      <li>Runs before 18 Nov 2026 were copied from the iMac's own log file; two runs that were cut off were added from their logs.</li>
+    </ul>
+  </details>
+</div>
+
+<script>
+  dash.loader('runs', {
+    description: 'Supabase returns the rows inside a short text note; this takes out the list of rows.',
+    fn: ({answer}) => {
+      let t = answer;
+      if (Array.isArray(t)) return t;
+      if (t && typeof t === 'object') { if (Array.isArray(t.rows)) return t.rows; t = t.result ?? JSON.stringify(t); }
+      t = String(t ?? '');
+      const m = t.match(/<untrusted-data-[^>]*>\s*(\[[\s\S]*\])\s*<\/untrusted-data-/);
+      if (m) return JSON.parse(m[1]);
+      const a = t.indexOf('['), b = t.lastIndexOf(']');
+      if (a >= 0 && b > a) return JSON.parse(t.slice(a, b + 1));
+      throw new Error('Supabase gave no rows: ' + t.slice(0, 200));
+    }
+  });
+  dash.loader('nights', {
+    description: 'Supabase returns the rows inside a short text note; this takes out the list of rows.',
+    fn: ({answer}) => {
+      let t = answer;
+      if (Array.isArray(t)) return t;
+      if (t && typeof t === 'object') { if (Array.isArray(t.rows)) return t.rows; t = t.result ?? JSON.stringify(t); }
+      t = String(t ?? '');
+      const m = t.match(/<untrusted-data-[^>]*>\s*(\[[\s\S]*\])\s*<\/untrusted-data-/);
+      if (m) return JSON.parse(m[1]);
+      const a = t.indexOf('['), b = t.lastIndexOf(']');
+      if (a >= 0 && b > a) return JSON.parse(t.slice(a, b + 1));
+      throw new Error('Supabase gave no rows: ' + t.slice(0, 200));
+    }
+  });
+
+  dash.calc('tally', {
+    inputs: ['nights'],
+    title: 'Nights by result',
+    description: 'How many of the shown nights (tonight left out) finished properly, had problems, or had no run.',
+    fn: (nights) => {
+      const past = nights.filter((n) => n.status !== 'tonight');
+      return [{
+        nights: past.length,
+        finished: past.filter((n) => n.status === 'finished').length,
+        problems: past.filter((n) => n.status === 'problems').length,
+        missed: past.filter((n) => n.status === 'no run' || n.status === 'not run').length
+      }];
+    }
+  });
+
+  window.nrClass = (s) => ({'finished': 's-finished', 'problems': 's-problems', 'no run': 's-norun', 'not run': 's-norun',
+    'running': 's-running', 'blocked': 's-blocked', 'tonight': 's-tonight', 'stopped': 's-problems', 'not_run': 's-norun'})[s] || 's-blocked';
+  window.nrWord = (s) => ({'finished': 'finished properly', 'problems': 'had problems', 'no run': 'had no run (the iMac may have been off)',
+    'not run': 'did not run (a check failed)', 'running': 'is still running', 'blocked': 'was blocked by an earlier run', 'tonight': 'has not started yet'})[s] || s;
+  window.nrMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  window.nrDay = (iso) => Number(iso.slice(8, 10)) + ' ' + nrMonths[Number(iso.slice(5, 7)) - 1];
+  window.nrWhen = (s) => s ? nrDay(s.slice(0, 10)) + ' ' + s.slice(11, 16) : '–';
+</script>
+
+<script>
+  const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+  const mark = (e, src, field, where) => { e.dataset.source = src; e.dataset.field = field; if (where) e.dataset.where = where; return e; };
+
+  // the sentence under the title: last night's result and the 30-night picture
+  dash.draw('lead', (p) => {
+    const n = dash.data('nights'), t = dash.data('tally');
+    if (n.status !== 'ok' || t.status !== 'ok' || !t.data?.length) { p.textContent = n.status === 'error' ? 'The run record failed to load.' : '—'; return; }
+    const last = n.data.find((r) => r.status !== 'tonight');
+    p.replaceChildren();
+    if (!last) { p.textContent = 'No nights recorded yet.'; return; }
+    const night = mark(el('b', null, nrDay(last.night)), 'nights', 'night', 'night=' + encodeURIComponent(last.night));
+    const status = mark(el('b', null, nrWord(last.status)), 'nights', 'status', 'night=' + encodeURIComponent(last.night));
+    const fin = mark(el('span', null, String(t.data[0].finished)), 'tally', 'finished'); fin.dataset.row = '0';
+    const tot = mark(el('span', null, String(t.data[0].nights)), 'tally', 'nights'); tot.dataset.row = '0';
+    p.append('Last night (', night, ') ', status, '. ', fin, ' of the last ', tot, ' nights finished properly.');
+  });
+
+  const tile = (field) => (e) => {
+    const t = dash.data('tally');
+    if (t.status === 'loading') return;
+    e.classList.remove('dash-skeleton');
+    e.textContent = t.status === 'ok' && t.data?.length ? String(t.data[0][field]) : '—';
+  };
+  dash.draw('t-finished', tile('finished'));
+  dash.draw('t-problems', tile('problems'));
+  dash.draw('t-missed', tile('missed'));
+
+  // one square per night, with a tooltip kept inside the page
+  dash.draw('strip', {
+    mount: (wrap) => {
+      wrap.replaceChildren();
+      const strip = el('div', 'nr-strip'); strip.setAttribute('role', 'list'); strip.setAttribute('aria-label', 'Status of each night');
+      const tip = el('div', 'nr-tip'); tip.hidden = true; tip.setAttribute('role', 'tooltip');
+      wrap.append(strip, tip);
+      return {strip, tip};
+    },
+    update: (wrap, made) => {
+      const n = dash.data('nights'), strip = made.strip;
+      strip.replaceChildren();
+      made.tip.hidden = true;
+      if (n.status !== 'ok') { strip.textContent = n.status === 'error' ? 'Failed to load' : '—'; return; }
+      const rows = [...n.data].reverse();
+      for (const r of rows) {
+        const cell = el('div', 'nr-night'); cell.tabIndex = 0; cell.setAttribute('role', 'listitem');
+        cell.setAttribute('aria-label', nrDay(r.night) + ': ' + nrWord(r.status));
+        const sq = mark(el('div', 'nr-sq ' + nrClass(r.status)), 'nights', 'status', 'night=' + encodeURIComponent(r.night));
+        cell.append(sq, el('span', 'nr-day', String(Number(r.night.slice(8, 10)))));
+        const show = () => {
+          made.tip.replaceChildren(el('b', null, nrDay(r.night) + ': ' + nrWord(r.status)), el('span', null, r.detail || 'Nothing was recorded for this night.'));
+          made.tip.hidden = false;
+          const box = wrap.getBoundingClientRect(), c = cell.getBoundingClientRect();
+          const w = made.tip.offsetWidth;
+          made.tip.style.left = Math.max(0, Math.min(c.left - box.left - w / 2 + 15, box.width - w)) + 'px';
+          made.tip.style.top = (c.bottom - box.top + 6) + 'px';
+        };
+        cell.addEventListener('pointerenter', show); cell.addEventListener('focus', show);
+        cell.addEventListener('pointerleave', () => { made.tip.hidden = true; }); cell.addEventListener('blur', () => { made.tip.hidden = true; });
+        strip.appendChild(cell);
+      }
+    },
+  });
+
+  // the table of every run
+  const outcomeWord = {finished: 'Finished', problems: 'Problems', not_run: 'Not run', blocked: 'Blocked', running: 'Running'};
+  const outcomeClass = {finished: 's-finished', problems: 's-problems', not_run: 's-norun', blocked: 's-blocked', running: 's-running'};
+  const num = (v) => v == null ? '–' : d3.format(',')(v);
+  dash.draw('runs-body', (tb) => {
+    const d = dash.data('runs');
+    tb.replaceChildren();
+    if (d.status !== 'ok') {
+      const tr = el('tr'), td = el('td', null, d.status === 'error' ? 'Failed to load' : '—'); td.colSpan = 9; tr.append(td); tb.append(tr); return;
+    }
+    for (const r of d.data) {
+      const tr = el('tr'); tr.dataset.key = encodeURIComponent(r.started);
+      const pill = el('span', 'nr-pill'); pill.append(el('i', 'nr-dot ' + (outcomeClass[r.outcome] || 's-blocked')), (r.result || outcomeWord[r.outcome] || r.outcome));
+      const res = el('td'); res.append(pill);
+      tr.append(el('td', 'when', nrWhen(r.started)), res, el('td', null, r.trigger === 'scheduled' ? '9 pm' : 'manual'),
+        el('td', 'num', num(r.new_files)), el('td', 'num', num(r.ingested)), el('td', 'num', num(r.searchable)),
+        el('td', 'num', r.deepseek_usd == null ? '–' : '$' + d3.format('.2f')(r.deepseek_usd)),
+        el('td', 'num', r.hours == null ? '–' : d3.format('.1f')(r.hours)), el('td', 'notes', r.notes || ''));
+      tb.append(tr);
+    }
+  });
+</script>

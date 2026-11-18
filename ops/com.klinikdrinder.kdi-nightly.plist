@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- The 9 pm nightly run (scripts_content_v1/nightly.py). Installed and removed by
+     deploy/launchd/install.sh. nightly.py keeps the Mac awake itself (caffeinate -w) until the
+     run ends; if the Mac was asleep at 21:00, launchd starts the run as soon as it wakes.
+     macOS privacy: background jobs may not read the NAS or the work drive until Python
+     (/opt/homebrew/Cellar/python@3.12/.../Python.app) has Full Disk Access in System Settings
+     (checked 10 Nov 2026: "Operation not permitted" without it). Python is started directly
+     (not through caffeinate) so that this one program is the one macOS asks about.
+     The launchd console log must NOT be on the work drive: launchd opens it before Python
+     starts and is refused, so the job never starts (exit 78 EX_CONFIG, found 11 Nov 2026).
+     nightly.py writes its real logs to work/logs/nightly itself. -->
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.klinikdrinder.kdi-nightly</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/Volumes/WorkDrive/repos/kdi-content-v1-pipeline/venv/bin/python</string>
+    <string>-u</string>
+    <string>/Volumes/WorkDrive/repos/kdi-content-v1-pipeline/scripts_content_v1/nightly.py</string>
+  </array>
+  <key>WorkingDirectory</key>
+  <string>/Volumes/WorkDrive/repos/kdi-content-v1-pipeline</string>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PIPELINE_TARGET</key>
+    <string>ml_test</string>
+    <key>PATH</key>
+    <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+  </dict>
+  <key>StartCalendarInterval</key>
+  <dict>
+    <key>Hour</key>
+    <integer>21</integer>
+    <key>Minute</key>
+    <integer>0</integer>
+  </dict>
+  <key>StandardOutPath</key>
+  <string>/tmp/kdi-nightly-launchd.log</string>
+  <key>StandardErrorPath</key>
+  <string>/tmp/kdi-nightly-launchd.log</string>
+  <key>ProcessType</key>
+  <string>Background</string>
+</dict>
+</plist>
