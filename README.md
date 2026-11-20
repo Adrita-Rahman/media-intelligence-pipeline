@@ -15,7 +15,7 @@ searchable in plain language on a staff search page.
 
 | | |
 |---|---|
-| Files catalogued | about 108,200 photos and videos (about 98,500 photos, 9,700 videos) |
+| Files catalogued | about 108,701 photos and videos (about 98,865 photos, 9,836 videos) |
 | Video scenes | over 109,000 scenes, each with its own description and search entry |
 | New uploads | analysed overnight and searchable the next morning, with no one starting any step |
 | Video speed-up | about 5 minutes per video down to about 20 seconds, by making a whole-library safety check incremental |
