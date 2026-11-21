@@ -11,34 +11,38 @@
   --serif:"Newsreader", Georgia, "Times New Roman", serif;
   --sans:"Public Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --mono:ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --grad:radial-gradient(ellipse 38% 55% at 44% 8%, rgba(255,255,255,.95), rgba(255,255,255,0) 70%),linear-gradient(100deg,#2B97AC 0%,#8ADBE9 20%,#EAF8FA 38%,#F9C9C3 52%,#F07B72 70%,#E2584F 86%,#A82A20 100%);
+  --glass:rgba(255,255,255,.74); --veil:rgba(255,255,255,.42);
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
     --bg:#171213; --panel:#211A1B; --ink:#EDE6E7; --muted:#A8999B; --line:#3A2F31;
     --wine:#D9707F; --wine-ink:#1A0F11; --rose:#3A2227; --amber:#E7B868; --amber-bg:#2E2617;
-    --red:#F0A39B; --red-bg:#341E1C; --code-bg:#2A2122; color-scheme:dark;
+    --red:#F0A39B; --red-bg:#341E1C; --code-bg:#2A2122; --grad:radial-gradient(ellipse 38% 55% at 44% 8%, rgba(255,255,255,.10), rgba(255,255,255,0) 70%),linear-gradient(100deg,#0E4450 0%,#1B6170 20%,#2C3A3D 38%,#3F2826 52%,#6A2622 70%,#7A221C 86%,#4E120D 100%); --glass:rgba(33,26,27,.80); --veil:rgba(23,18,19,.55); color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
   --bg:#171213; --panel:#211A1B; --ink:#EDE6E7; --muted:#A8999B; --line:#3A2F31;
   --wine:#D9707F; --wine-ink:#1A0F11; --rose:#3A2227; --amber:#E7B868; --amber-bg:#2E2617;
-  --red:#F0A39B; --red-bg:#341E1C; --code-bg:#2A2122; color-scheme:dark;
+  --red:#F0A39B; --red-bg:#341E1C; --code-bg:#2A2122; --grad:radial-gradient(ellipse 38% 55% at 44% 8%, rgba(255,255,255,.10), rgba(255,255,255,0) 70%),linear-gradient(100deg,#0E4450 0%,#1B6170 20%,#2C3A3D 38%,#3F2826 52%,#6A2622 70%,#7A221C 86%,#4E120D 100%); --glass:rgba(33,26,27,.80); --veil:rgba(23,18,19,.55); color-scheme:dark;
 }
 html,body{height:100%}
 *,*::before,*::after{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
+/* teal to coral background on every view */
+body::before{content:"";position:fixed;inset:0;background:var(--grad);z-index:-1;pointer-events:none}
 button,input,textarea{font:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--wine);outline-offset:2px}
 
-.app{height:100%;display:flex;flex-direction:column;max-width:880px;margin:0 auto;background:var(--panel);border-left:1px solid var(--line);border-right:1px solid var(--line)}
+.app{height:100%;display:flex;flex-direction:column;max-width:880px;margin:0 auto;background:transparent;border-left:1px solid var(--line);border-right:1px solid var(--line)}
 header,#log,footer{padding-left:max(24px, env(safe-area-inset-left,0px));padding-right:max(24px, env(safe-area-inset-right,0px))}
-header{padding-block:20px 16px;border-bottom:1px solid var(--line)}
+header{padding-block:20px 16px;border-bottom:1px solid var(--line);background:var(--glass);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
 header h1{margin:0;font-size:1.25rem;font-weight:700;letter-spacing:-.01em;text-wrap:balance}
 header h1 span{color:var(--wine);font-weight:600}
 .stats{display:flex;flex-wrap:wrap;gap:4px 18px;margin-top:8px;color:var(--muted);font-size:.875rem}
 .stats b{color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
 
-#log{flex:1;overflow-y:auto;padding-block:24px;background:var(--bg)}
+#log{flex:1;overflow-y:auto;padding-block:24px;background:var(--veil)}
 .turn{margin:0 0 28px}
 .who{font-size:.8125rem;color:var(--muted);margin-bottom:6px;font-weight:500}
 .bot .say{font-family:var(--serif);font-size:1.25rem;line-height:1.55;max-width:62ch}
@@ -91,15 +95,12 @@ img.k.ready{opacity:1}
 .where code{flex:1;min-width:0;font-family:var(--mono);font-size:.75rem;background:var(--code-bg);border-radius:4px;padding:6px 8px;overflow-wrap:anywhere;user-select:all}
 .res-foot{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px;align-items:center}
 a.btn{text-decoration:none;display:inline-block}
-.via{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:10px;font-size:.8125rem;color:var(--muted)}
-.via button{background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:3px 11px;font-size:.8125rem;cursor:pointer}
-.via button[aria-pressed="true"]{background:var(--wine);border-color:var(--wine);color:var(--wine-ink)}
 
 .notice{background:var(--amber-bg);color:var(--amber);border-radius:6px;padding:12px 14px;font-size:.9375rem;max-width:580px}
 .notice.err{background:var(--red-bg);color:var(--red)}
 .notice .btn{margin-top:10px}
 
-footer{border-top:1px solid var(--line);padding-block:14px 16px;background:var(--panel)}
+footer{border-top:1px solid var(--line);padding-block:14px 16px;background:var(--glass);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
 .composer{display:flex;gap:10px;align-items:flex-end}
 .composer textarea{flex:1;min-width:0;min-height:48px;max-height:160px;resize:none;border:1.5px solid var(--line);border-radius:10px;padding:12px 14px;background:var(--panel);line-height:1.4}
 .composer textarea:focus{border-color:var(--wine);outline:none}
@@ -121,10 +122,6 @@ footer{border-top:1px solid var(--line);padding-block:14px 16px;background:var(-
   <header>
     <h1>Content Desk <span>Klinik Dr Inder</span></h1>
     <div class="stats" id="stats"><span>Loading the library…</span></div>
-    <div class="via" role="group" aria-label="How this device reaches the clinic files">Open files through:
-      <button type="button" data-via="tailscale">Tailscale app</button>
-      <button type="button" data-via="wifi">Clinic Wi-Fi</button>
-    </div>
   </header>
   <main id="log" aria-live="polite"></main>
   <footer>
@@ -145,16 +142,7 @@ const SHOW = 10;          // files Claude may pick from them
 // Links carry the file's sha256 only, never a name. Tailscale works anywhere with the app on;
 // the Wi-Fi address only inside the clinic.
 const VIEWER = {tailscale: "http://YOUR-MAC-TAILSCALE-IP:8790", wifi: "http://YOUR-MAC-LAN-IP:8790"};
-let via = "tailscale";
-try { const v = localStorage.getItem("kdi-via"); if (VIEWER[v]) via = v; } catch {}
-function setVia(v){
-  via = v;
-  try { localStorage.setItem("kdi-via", v); } catch {}
-  document.querySelectorAll("[data-via]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.via === v)));
-  document.querySelectorAll("a[data-file]").forEach(a => a.href = VIEWER[via] + a.dataset.file);
-}
-document.querySelectorAll("[data-via]").forEach(b => b.onclick = () => setVia(b.dataset.via));
-setVia(via);
+const via = "tailscale";   // files open through Tailscale
 
 const LOOK = {EAST_ASIAN:"Chinese / East Asian look", MALAY_SEA:"Malay / Southeast Asian look", SOUTH_ASIAN:"Indian / South Asian look",
   CAUCASIAN:"Caucasian look", MIDDLE_EASTERN:"Middle Eastern look", AFRICAN:"African look"};
