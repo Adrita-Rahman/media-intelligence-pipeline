@@ -15,8 +15,8 @@ searchable in plain language on a staff search page.
 
 | | |
 |---|---|
-| Files catalogued | about 108,701 photos and videos (about 98,865 photos, 9,836 videos) |
-| Video scenes | over 109,000 scenes, each with its own description and search entry |
+| Files catalogued | about 108,701 photos and videos (about 98,865 photos, 9,836 videos), all searchable, number of searchable files will increase if new files are uploaded into UGREEN NAS during the 9 pm daily run |
+| Video scenes | about 22,800 scenes, each with its own description; about 121,600 search entries in all |
 | New uploads | analysed overnight and searchable the next morning, with no one starting any step |
 | Video speed-up | about 5 minutes per video down to about 20 seconds, by making a whole-library safety check incremental |
 | Privacy | patient names live in separate private tables; logs hold counts and item codes only |
